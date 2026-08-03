@@ -1,0 +1,52 @@
+name: Basic Linux Demo Action
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  linux_actions:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Print Hello Message
+        run: echo "Hello world from the Git repository!"
+
+      - name: Show current working directory
+        run: pwd
+      
+      - name: list repository files
+        run: ls -ll
+      
+      - name: create a directroy
+        run: mkdir -p ouptut
+      
+      - name: create a text file
+        run: echo "This is a demo file created by the GitHub Action." > output/message.txt
+
+      - name: Display the content of the text file
+        run: cat output/message.txt
+
+      - name: List output directory files
+        run: ls -la output
+
+      - name: Display multiple messages
+        run: |
+          echo "Start writing multiple lines of messages"
+          echo "Repository name: ${{ github.repository }}"
+          echo "Branch name: ${{ github.ref_name }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Trigger: ${{ github.actor }}"
+
+      - name: Disk information
+        run: df -h
+
+      - name: System information
+        run: uname -a
+
+      - name: Final message
+        run: echo "GitHub Action completed successfully!"
