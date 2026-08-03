@@ -1,53 +1,201 @@
-name: Basic Linux Demo Action
- 
+name: Basic Linux and Manual Checkout Demo
+
 on:
   push:
     branches:
       - main
- 
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
 jobs:
   linux_actions:
+    name: Linux Commands Using Checkout Action
     runs-on: ubuntu-latest
- 
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
- 
-      - name: Print Hello Message
-        run: echo "Hello world from the Git repository!"
- 
-      - name: Show current working directoru
+
+      - name: Print hello message
+        run: echo "Hello World from the GitHub repository"
+
+      - name: Show current working directory
         run: pwd
-     
-      - name: list repository files
-        run: ls -ll
-     
-      - name: create a directroy
+
+      - name: List repository files
+        run: ls -la
+
+      - name: Create output directory
         run: mkdir -p output
-     
-      - name: create a text file
-        run: echo "This is a demo file created by the GitHub Action." > output/message.txt
- 
-      - name: Display the content of the text file
-        run: cat output/message.txt
-     
-      - name: List output directory files
-        run: ls -la output
-     
-      - name: Display multiple messages
+
+      - name: Create a text file
         run: |
-          echo "Start writing multiple messages"
-          echo "Repository: ${{github.repository}}"
-          echo "Branch: ${{github.ref_name}}"
-          echo "Commit Sha: ${{github.sha}}"
-          echo "Trigger: ${{github.actor}}"
- 
-      - name: Disk Information
+          echo "This file was created by GitHub Actions" > output/message.txt
+
+      - name: Display file content
+        run: cat output/message.txt
+
+      - name: Copy the text file
+        run: |
+          cp output/message.txt output/message-copy.txt
+
+      - name: Append content to file
+        run: |
+          echo "This is the second line" >> output/message.txt
+
+      - name: Display updated file
+        run: cat output/message.txt
+
+      - name: List output directory
+        run: ls -la output
+
+      - name: Display GitHub context information
+        run: |
+          echo "Repository: ${{ github.repository }}"
+          echo "Repository owner: ${{ github.repository_owner }}"
+          echo "Branch or tag: ${{ github.ref_name }}"
+          echo "Full Git reference: ${{ github.ref }}"
+          echo "Commit SHA: ${{ github.sha }}"
+          echo "Triggered by: ${{ github.actor }}"
+          echo "Event name: ${{ github.event_name }}"
+          echo "Workflow name: ${{ github.workflow }}"
+          echo "Job name: ${{ github.job }}"
+          echo "Run ID: ${{ github.run_id }}"
+          echo "Run number: ${{ github.run_number }}"
+
+      - name: Check whether file exists
+        run: |
+          if [ -f output/message.txt ]; then
+            echo "output/message.txt exists"
+          else
+            echo "output/message.txt does not exist"
+            exit 1
+          fi
+
+      - name: Display disk information
         run: df -h
- 
-      - name: System Information
+
+      - name: Display memory information
+        run: free -h
+
+      - name: Display system information
         run: uname -a
- 
+
+      - name: Display current user
+        run: whoami
+
+      - name: Display current date
+        run: date
+
       - name: Final message
-        run: echo "Github Sction completed successfully"
- 
+        run: echo "Completed all Linux commands successfully"
+
+  manual_checkout:
+    name: Manual Git Checkout
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Initialize repository
+        run: |
+          echo "Initializing an empty Git repository"
+          git init
+
+      - name: Configure repository and authentication
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: |
+          echo "Adding remote repository"
+
+          git remote add origin \
+            "https://github.com/${REPOSITORY}.git"
+
+          echo "Creating Basic authentication value"
+
+          BASIC_AUTH=$(printf "x-access-token:%s" "${GITHUB_TOKEN}" | base64 -w 0)
+
+          git config http.https://github.com/.extraheader \
+            "AUTHORIZATION: basic ${BASIC_AUTH}"
+
+          echo "Git authentication configured"
+
+      - name: Fetch the triggering commit
+        env:
+          COMMIT_SHA: ${{ github.sha }}
+        run: |
+          echo "Fetching commit: ${COMMIT_SHA}"
+
+          git fetch \
+            --no-tags \
+            --depth=1 \
+            origin \
+            "${COMMIT_SHA}"
+
+      - name: Checkout fetched commit
+        run: |
+          echo "Checking out FETCH_HEAD"
+
+          git checkout --detach FETCH_HEAD
+
+      - name: Display Git status
+        run: git status
+
+      - name: Display checked-out commit
+        run: |
+          echo "Checked-out commit:"
+          git log -1 --oneline
+
+      - name: Display remote information
+        run: git remote -v
+
+      - name: Show current working directory
+        run: pwd
+
+      - name: List manually checked-out files
+        run: ls -la
+
+      - name: Display repository files recursively
+        run: |
+          find . \
+            -path "./.git" -prune \
+            -o -type f -print
+
+      - name: Verify the checked-out SHA
+        env:
+          EXPECTED_SHA: ${{ github.sha }}
+        run: |
+          ACTUAL_SHA=$(git rev-parse HEAD)
+
+          echo "Expected SHA: ${EXPECTED_SHA}"
+          echo "Actual SHA:   ${ACTUAL_SHA}"
+
+          if [ "${ACTUAL_SHA}" = "${EXPECTED_SHA}" ]; then
+            echo "The correct commit was checked out"
+          else
+            echo "The checked-out commit does not match"
+            exit 1
+          fi
+
+      - name: Run Linux commands after manual checkout
+        run: |
+          echo "Manual checkout completed successfully"
+
+          mkdir -p manual-output
+
+          echo "Repository: ${{ github.repository }}" \
+            > manual-output/repository-info.txt
+
+          echo "Commit: ${{ github.sha }}" \
+            >> manual-output/repository-info.txt
+
+          echo "Branch: ${{ github.ref_name }}" \
+            >> manual-output/repository-info.txt
+
+          cat manual-output/repository-info.txt
+
+      - name: Final manual checkout message
+        run: |
+          echo "Repository downloaded and checked out manually"
