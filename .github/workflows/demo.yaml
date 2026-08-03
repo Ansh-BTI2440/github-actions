@@ -207,12 +207,14 @@ jobs:
     steps:
       - name: Pull Ubuntu Image
         run: docker pull ubuntu:latest
-        
-      - name: Run Docker container
+
+      - name: Run Docker Container
         run: |
           docker run -d \
             --name demo-container \
-            ubuntu:latest
+            ubuntu:latest \
+            tail -f /dev/null
+
       - name: Execute commands inside Docker container
         run: |
           docker exec demo-container bash -c "echo 'Hello from inside the Docker container!'" 
