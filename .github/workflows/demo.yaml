@@ -224,7 +224,7 @@ jobs:
           TOKEN: ${{ secrets.ACTION_DEMO_2 }}
         run: |
           if [ -z "$TOKEN" ]; then
-            echo "Token is empty"
+            echo "Token is empty ."
             exit 1
           else
             echo "Token length: ${#TOKEN}"
