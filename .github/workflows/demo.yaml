@@ -218,7 +218,17 @@ jobs:
       - name: Execute commands inside Docker container
         run: |
           docker exec demo-container bash -c "echo 'Hello from inside the Docker container!'" 
-
+      
+      - name: Verify Secret
+        env:
+          TOKEN: ${{ secrets.ACTION_DEMO_2 }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "Token is empty"
+            exit 1
+          else
+            echo "Token length: ${#TOKEN}"
+          fi
       - name: Clone Private Repository
         env:
           TOKEN: ${{ secrets.ACTION_DEMO_2 }}
