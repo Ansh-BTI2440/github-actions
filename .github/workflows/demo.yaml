@@ -223,7 +223,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: Ansh-BTI2440/github-demo-private
-          token: ${{ secrets.ACTION-DEMO }}
+          token: ${{ secrets.ACTION_DEMO_2 }}
           path: private-repo
 
       - name: List Repository Files
