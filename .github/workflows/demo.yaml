@@ -220,11 +220,10 @@ jobs:
           docker exec demo-container bash -c "echo 'Hello from inside the Docker container!'" 
 
       - name: Checkout Private Repository
-        uses: actions/checkout@v4
-        with:
-          repository: Ansh-BTI2440/github-demo-private
-          token: ${{ secrets.ACTION_DEMO_2 }}
-          path: private-repo
+        env:
+          TOKEN: ${{ secrets.ACTION_DEMO_2 }}
+        run: |
+          git clone https://x-access-token:${TOKEN}@github.com/Ansh-BTI2440/github-demo-private.git private-repo
 
       - name: List Repository Files
         run: |
