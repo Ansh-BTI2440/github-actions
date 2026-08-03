@@ -199,3 +199,30 @@ jobs:
       - name: Final manual checkout message
         run: |
           echo "Repository downloaded and checked out manually"
+  
+  docker_checkout:
+    name: Docker Container Checkout
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Docker container
+        run: |
+          docker run -d \
+            --name demo-container \
+            ubuntu:latest
+      - name: Execute commands inside Docker container
+        run: |
+          docker exec demo-container bash -c "echo 'Hello from inside the Docker container!'" 
+
+            - name: Checkout Private Repository
+
+      - name: Checkout Private Repository
+        uses: actions/checkout@v4
+        with:
+          repository: Ansh-BTI2440/github-demo-private
+          token: ${{ secrets.PAT_TOKEN }}
+          path: private-repo
+
+      - name: List Repository Files
+        run: |
+          ls -la private-repo
