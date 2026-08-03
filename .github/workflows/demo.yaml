@@ -237,4 +237,4 @@ jobs:
 
       - name: List Repository Files
         run: |
-          ls -la private-repo
+          ls -la
