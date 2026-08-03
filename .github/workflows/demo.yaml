@@ -205,6 +205,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Pull Ubuntu Image
+        run: docker pull ubuntu:latest
+        
       - name: Run Docker container
         run: |
           docker run -d \
